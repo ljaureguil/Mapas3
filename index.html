@@ -119,6 +119,21 @@ footer {
   function initMap() {
     map = L.map('map').setView([42.2711, -89.0937], 12);
   
+    //////////////////////////
+
+setTimeout(function(){
+				map.on('click', 
+					function(e){
+						var coord = e.latlng.toString().split(',');
+						var lat = coord[0].split('(');
+						var lng = coord[1].split(')');
+						alert("You clicked the map at latitude: " + lat[1] + " and longitude:" + lng[0]);
+					});
+},1000);
+
+
+
+    //////////////////////////////////
     // OpenStreetMap Tile Layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
@@ -217,4 +232,19 @@ var marker = L.marker([cord.latitude, cord.longitude]).addTo(map);
 window.navigator.geolocation.getCurrentPosition(function(cord){callback(cord)}, error, options);
 
   }
+/*
+map.on('click', function(e) {
+    var lat = e.latlng.lat;
+    var lng = e.latlng.lng;
+    alert("Clicked at latitude: " + lat + " and longitude: " + lng);
+});
+
+*/
+
+
+
+
+
+
+
 </script>
