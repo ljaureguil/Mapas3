@@ -180,11 +180,11 @@ footer {
 function success(pos) {
   const crd = pos.coords;
 
-  alert("Your current position is:  "+`Latitude : ${crd.latitude}`+`Longitude: ${crd.longitude}`+`More or less ${crd.accuracy} meters.`);
+ // alert("Your current position is:  "+`Latitude : ${crd.latitude}`+`Longitude: ${crd.longitude}`+`More or less ${crd.accuracy} meters.`);
   map.setView([crd.latitude, crd.longitude], 13);
 
-var marker = L.marker([crd.latitude, crd.longitude]).addTo(map);
-    marker.bindPopup("<b>AQUI</b><br>is here").openPopup();
+//var marker = L.marker([crd.latitude, crd.longitude]).addTo(map);
+ //   marker.bindPopup("<b>AQUI</b><br>is here").openPopup();
 
 }
 
@@ -197,17 +197,21 @@ function error(err) {
   window.navigator.geolocation.getCurrentPosition(success, error, options);
   
   addMark = function(){
-// window.navigator.geolocation.getCurrentPosition(function(crd){ 
-getGCords(function(cord){
-  var cos=JSON.stringify(cord);
-  alert(cos)
-  map.setView([cord.latitude, crd.longitude], 13);
+ window.navigator.geolocation.getCurrentPosition(function(pos){ 
+ var cord= pos.coords;
+//getGCords(function(cord){
+  var cos=JSON.stringify(cord).replace(/"/g," ").replace(/,/g,"<br>").replace(/{/g,"<br>").replace(/}/g,"<br>");
+ // alert(cos)
+  map.setView([cord.latitude, cord.longitude], 13);
 
 var marker = L.marker([cord.latitude, cord.longitude]).addTo(map);
-  marker.coords=cos
-    marker.bindPopup("<b>"+marker.coord+"</b><br>is here").openPopup();}, error, options);
+ // marker.coords=cos;//marker.coord
+    marker.bindPopup("<b>"+cos+"</b>").openPopup()
+  //   marker.bindPopup("<b>oooo</b><br>is here").openPopup();
+ })
+ 
+    } 
   
-  }
 
   function getGCords(callback){
 window.navigator.geolocation.getCurrentPosition(function(cord){callback(cord)}, error, options);
