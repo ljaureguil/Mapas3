@@ -201,10 +201,12 @@ function error(err) {
 getGCords(function(cord){
   var cos=JSON.stringify(cord);
   alert(cos)
-  map.setView([crd.latitude, crd.longitude], 13);
+  map.setView([cord.latitude, crd.longitude], 13);
 
-var marker = L.marker([crd.latitude, crd.longitude]).addTo(map);
-    marker.bindPopup("<b>"+cos+"</b><br>is here").openPopup();}, error, options);
+var marker = L.marker([cord.latitude, cord.longitude]).addTo(map);
+  marker.coords=cos
+    marker.bindPopup("<b>"+marker.coord+"</b><br>is here").openPopup();}, error, options);
+  
   }
 
   function getGCords(callback){
