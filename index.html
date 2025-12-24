@@ -1,4 +1,15 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<head>
+    <meta name="viewport" content="width=device-width">
+    <link rel="icon" href="https://cdn.pixabay.com/photo/2023/11/01/12/18/mail-8357450_1280.jpg">
+    <title>Mapas3</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+
+
+
+
 <style>
 #map {
   position: absolute;
@@ -102,7 +113,42 @@ footer {
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-  let map,coord={};
+var linklib="https://raw.githubusercontent.com/ljaureguil/My-Library/refs/heads/master/MyLibmin.js";
+var link="https://api.jsonblob.com/019b5163-39dc-74c4-b292-6655ebb3cf98"
+
+
+loadDoc = function(url,callback) {
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", url, false);
+        xhttp.send();
+       if(callback!=undefined) callback(xhttp.responseText);
+        return xhttp.responseText;
+    }
+
+
+
+
+
+loadDoc(linklib,function(data){
+  eval(data);
+
+  GetJson(link,function(r){
+    alert(JSON.stringify(r) );
+  });
+})
+
+
+  
+
+
+
+
+
+
+
+
+  let map,coord={},routes=[],route={points:[]};
   let markers = { water: [], shelter: [] };
   let markerState = { water: true, shelter: true }; // Track enabled/disabled states
   
@@ -128,6 +174,7 @@ setTimeout(function(){
 						var lat = coord[0].split('(');
 						var lng = coord[1].split(')');
 						alert("You clicked the map at latitude: " + lat[1] + " and longitude:" + lng[0]);
+            alert(GetJson);
 					});
 },1000);
 
