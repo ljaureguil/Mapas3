@@ -149,7 +149,7 @@ loadDoc(linklib,function(data){
 
 
   let map,coord={},routes=[],route={points:[]};
-  let markers = { water: [], shelter: [] };
+  let markers = { water: [], shelter: [] },marker;
   let markerState = { water: true, shelter: true }; // Track enabled/disabled states
   
   // Example Locations
@@ -170,11 +170,17 @@ loadDoc(linklib,function(data){
 setTimeout(function(){
 				map.on('click', 
 					function(e){
-						var coord = e.latlng.toString().split(',');
+						var coord = e.latlng.toString().split(',');//alert(e.latlng.toString())
+
 						var lat = coord[0].split('(');
 						var lng = coord[1].split(')');
-						alert("You clicked the map at latitude: " + lat[1] + " and longitude:" + lng[0]);
-            alert(GetJson);
+						alert("You clicked the map at latitude: " + lat[1] + "\n\n and longitude:" + lng[0]);
+   var lat = (e.latlng.lat);
+    var lng = (e.latlng.lng);
+    var newLatLng = new L.LatLng(lat, lng);
+    marker.setLatLng(newLatLng); 
+      marker.bindPopup("<b>"+coord+"</b><br>is here").openPopup();
+           
 					});
 },1000);
 
@@ -245,8 +251,11 @@ function success(pos) {
  // alert("Your current position is:  "+`Latitude : ${crd.latitude}`+`Longitude: ${crd.longitude}`+`More or less ${crd.accuracy} meters.`);
   map.setView([crd.latitude, crd.longitude], 13);
 
-//var marker = L.marker([crd.latitude, crd.longitude]).addTo(map);
- //   marker.bindPopup("<b>AQUI</b><br>is here").openPopup();
+ marker = L.marker([crd.latitude, crd.longitude]).addTo(map);
+    marker.bindPopup("<b>AQUI</b><br>is here").openPopup();
+
+  //  alert(JSON.stringify(marker));
+ //   alert(marker.latitude)
 
 }
 
@@ -279,14 +288,6 @@ var marker = L.marker([cord.latitude, cord.longitude]).addTo(map);
 window.navigator.geolocation.getCurrentPosition(function(cord){callback(cord)}, error, options);
 
   }
-/*
-map.on('click', function(e) {
-    var lat = e.latlng.lat;
-    var lng = e.latlng.lng;
-    alert("Clicked at latitude: " + lat + " and longitude: " + lng);
-});
-
-*/
 
 
 
