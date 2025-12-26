@@ -294,7 +294,7 @@ window.navigator.geolocation.getCurrentPosition(function(cord){callback(cord)}, 
 
   }
 
-
+var arpol=[],areapol=0;
 function selectOpc(val){
   if(val==="option2"){
     route={points:[]};
@@ -306,10 +306,18 @@ function selectOpc(val){
             route.points.push([lat,lng]);
           //  alert("Point added to polygon: " + lat + ", " + lng);
             marker = L.marker([lat,lng]).addTo(map);
-            var so=route.points.length;
+            var point=geodeticToEcef(lat,lng,0) ;
+           // alert(JSON.stringify(point));
+            arpol.push(point);
+
+
+            var so=route.points.length+"\n"+areapol+"\n"+JSON.stringify( point ).replace(/"/g," ").replace(/,/g,"<br>").replace(/{/g,"<br>").replace(/}/g,"<br>");
 
             marker.bindPopup("<b>Point: "+so+"  "+"</b>").openPopup()
             if(route.points.length>=3){
+            areapol=calculatePolygonArea(arpol);
+            alert("Current Polygon Area (ECEF coords): "+areapol+" square meters.");
+
               if(routes.length>0){
                 map.removeLayer(routes[routes.length-1]);
 
@@ -378,16 +386,44 @@ marker = L.marker([lat,lng]).addTo(map);
 
 
 function calculatePolygonArea(coords) {
+ //alert(JSON.stringify(coords));
   let area = 0;
-  for (let i = 0; i < coords.length; i++) {
-    const [x1, y1] = coords[i];
-    const [x2, y2] = coords[(i + 1) % coords.length];
+  for (let i = 0; i < coords.length-1; i++) {
+  //  alert(JSON.stringify(coords[i]));
+     var co=[coords[i].x,coords[i].y];
+     var co2=[[coords[i+1].x,coords[i+1].y]];
+    const [x1, y1] = co;
+    const [x2, y2] = co2;
     area += x1 * y2 - x2 * y1;
   }
   return Math.abs(area / 2); // Use Math.abs for a positive area value
 }
 
 
+function geodeticToEcef(latitude, longitude, altitude = 0) {
+    // WGS84 ellipsoid constants
+    const a = 6378137.0; // Semi-major axis (meters)
+    const f = 1.0 / 298.257223563; // Flattening factor
+    const eSq = 2 * f - f * f; // Eccentricity squared
+
+    // Convert degrees to radians
+    const latRad = latitude * Math.PI / 180;
+    const lonRad = longitude * Math.PI / 180;
+
+    const sinLat = Math.sin(latRad);
+    const cosLat = Math.cos(latRad);
+    const sinLon = Math.sin(lonRad);
+    const cosLon = Math.cos(lonRad);
+
+    const N = a / Math.sqrt(1 - eSq * sinLat * sinLat); // Prime vertical radius of curvature
+
+    // Calculate ECEF coordinates
+    const x = (N + altitude) * cosLat * cosLon;
+    const y = (N + altitude) * cosLat * sinLon;
+    const z = ((1 - eSq) * N + altitude) * sinLat;
+
+    return { x, y, z };
+}
 
 
 
