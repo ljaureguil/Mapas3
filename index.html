@@ -152,7 +152,7 @@ loadDoc(linklib,function(data){
 
 
 
-  let map,coord={},routes=[],route={points:[]},lastPoint=null;
+  let map,coord={},routes=[],route={points:[]},lastPoint=null,polarea=0,polpoints=[];
   let markers = { water: [], shelter: [] },marker;
   let markerState = { water: true, shelter: true }; // Track enabled/disabled states
   
@@ -304,9 +304,11 @@ function selectOpc(val){
             var lat = (e.latlng.lat);
             var lng = (e.latlng.lng);
             route.points.push([lat,lng]);
-            alert("Point added to polygon: " + lat + ", " + lng);
+          //  alert("Point added to polygon: " + lat + ", " + lng);
             marker = L.marker([lat,lng]).addTo(map);
-            
+            var so=route.points.length;
+
+            marker.bindPopup("<b>Point: "+so+"  "+"</b>").openPopup()
             if(route.points.length>=3){
               if(routes.length>0){
                 map.removeLayer(routes[routes.length-1]);
@@ -375,7 +377,15 @@ marker = L.marker([lat,lng]).addTo(map);
 }
 
 
-
+function calculatePolygonArea(coords) {
+  let area = 0;
+  for (let i = 0; i < coords.length; i++) {
+    const [x1, y1] = coords[i];
+    const [x2, y2] = coords[(i + 1) % coords.length];
+    area += x1 * y2 - x2 * y1;
+  }
+  return Math.abs(area / 2); // Use Math.abs for a positive area value
+}
 
 
 
