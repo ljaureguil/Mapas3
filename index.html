@@ -110,9 +110,9 @@ footer {
 </footer>
 <button onclick="addMark()" style="z-index:101;width: 10%;height: 5%;background-color: rgb(219, 30, 30);position:absolute;bottom: 3%;">Mark</button>
 <select id="sopc" oninput="selectOpc(this.value)" style="z-index:101;width: 10%;height: 5%;background-color: rgb(219, 30, 30);position:absolute;bottom: 3%;right:1%;">
-  <option value="option1">Choose an Option</option>
-  <option value="option2">make polygon</option>
-  <option value="option3">calc dist</option>
+  <option >Choose an Option</option>
+  <option >make polygon</option>
+  <option >calc dist</option>
 </select>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -138,7 +138,7 @@ loadDoc(linklib,function(data){
   eval(data);
 
   GetJson(link,function(r){
-    alert(JSON.stringify(r) );
+ //   alert(JSON.stringify(r) );
   });
 })
 
@@ -174,17 +174,18 @@ loadDoc(linklib,function(data){
 setTimeout(function(){
 				map.on('click', 
 					function(e){
-						var coord = e.latlng.toString().split(',');//alert(e.latlng.toString())
-
-						var lat = coord[0].split('(');
-						var lng = coord[1].split(')');
-			//			alert("You clicked the map at latitude: " + lat[1] + "\n\n and longitude:" + lng[0]);
-   var lat = (e.latlng.lat);
-    var lng = (e.latlng.lng);
-    var newLatLng = new L.LatLng(lat, lng);
-    marker.setLatLng(newLatLng); 
-      marker.bindPopup("<b>"+coord+"</b><br>is here").openPopup();
-      lastPoint={lat:lat,lng:lng};
+          //  alert("ok");
+       //     alert(sopc.value);
+            if(sopc.value==="make polygon"){
+              propoly(e)
+            };
+            if(sopc.value==="calc dist"){
+              procdist(e)
+            };
+            if(sopc.value==="Choose an Option"){
+              prodef(e);
+            };
+	
            
 					});
 },1000);
@@ -296,106 +297,29 @@ window.navigator.geolocation.getCurrentPosition(function(cord){callback(cord)}, 
 
 var arpol=[],areapol=0;
 function selectOpc(val){
-  if(val==="option2"){
-    route={points:[]};
-    routes=[];
-    map.on('click', 
-          function(e){
-            var lat = (e.latlng.lat);
-            var lng = (e.latlng.lng);
-            route.points.push([lat,lng]);
-          //  alert("Point added to polygon: " + lat + ", " + lng);
-            marker = L.marker([lat,lng]).addTo(map);
-            var point=geodeticToEcef(lat,lng,0) ;
-           // alert(JSON.stringify(point));
-            arpol.push(point);
+ 
+  if(val==="make polygon"){
 
-
-            var so=route.points.length+"\n"+areapol+"\n"+JSON.stringify( point ).replace(/"/g," ").replace(/,/g,"<br>").replace(/{/g,"<br>").replace(/}/g,"<br>");
-
-            marker.bindPopup("<b>Point: "+so+"  "+"</b>").openPopup()
-            if(route.points.length>=3){
-            areapol=calculatePolygonArea(arpol);
-            alert("Current Polygon Area (ECEF coords): "+areapol+" square meters.");
-
-              if(routes.length>0){
-                map.removeLayer(routes[routes.length-1]);
-
-              }
-              var polygon = L.polygon(route.points, {color: 'blue'}).addTo(map);
-              routes.push(polygon);
-            }
-          })
   }
-  if(val==="option3"){
-    route={points:[]};
-    routes=[];
-    map.on('click', 
-          function(e){
-            var lat = (e.latlng.lat);
-            var lng = (e.latlng.lng);
-            route.points.push([lat,lng]);
-        //    alert("Point added to distance calc: " + lat + ", " + lng);
-var myIcon = L.icon({
-    iconUrl: 'https://www.pngguru.in/storage/uploads/images/a-colorful-bird-free-png-images-on-transparent-background_1744195175_1266534286.webp',
-    iconSize: [38, 95],
-    iconAnchor: [22, 94],
-    popupAnchor: [-3, -76],
-   // shadowUrl: 'my-icon-shadow.png',
-    shadowSize: [68, 95],
-    shadowAnchor: [22, 94]
-});
-/*var myIcon = L.divIcon({
-    className: 'my-div-icon',
-    html: '<div style="background-color: red; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;">punto uno</div>',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12]
-});*/
-var myIcon = L.divIcon({className: 'my-div-icon'});
-//alert(JSON.stringify(myIcon));
-//L.marker([lat,lng], {icon: myIcon}).addTo(map);
-marker = L.marker([lat,lng]).addTo(map);
-
-          //   marker = L.marker([lat,lng]).addTo(map);
-            if(route.points.length===2){
-              var from=L.latLng(route.points[0][0],route.points[0][1]);
-              var to=L.latLng(route.points[1][0],route.points[1][1]);
-              var dist=from.distanceTo(to);
-              var obdis={};
-              obdis.distance=dist.toFixed(2);
-              obdis.from=from;
-              obdis.to=to;
-              var so=JSON.stringify(obdis).replace(/"/g," ").replace(/,/g,"<br>").replace(/{/g,"<br>").replace(/}/g,"<br>");
-          //    alert(JSON.stringify(obdis));
-           //
-              myLine = L.polyline([route.points[0], route.points[1]], {color: 'green'}).addTo(map);
-           //   alert("Distance between points: "+dist.toFixed(2)+" meters.");
-//L.marker([lat,lng], {icon: myIcon}).addTo(map);
-marker = L.marker([lat,lng]).addTo(map);
- marker.bindPopup("<b>Distance to previous point: "+so+" meters."+"</b>").openPopup()
-//marker = L.marker([lat,lng], {icon: myIcon}).addTo(map);
-         //     marker = L.marker([lat,lng]).addTo(map);
-              route={points:[]};
-              if(routes.length>0){
-                map.removeLayer(routes[routes.length-1]);
-              }
-            }
-          })
-  }
+  if(val==="calc dist"){
+  
+}
 }
 
-
 function calculatePolygonArea(coords) {
- //alert(JSON.stringify(coords));
+ var ccoords=Array.from(coords);
+ ccoords.push(coords[0]); // Close the polygon by adding the first point at the end
   let area = 0;
-  for (let i = 0; i < coords.length-1; i++) {
-  //  alert(JSON.stringify(coords[i]));
-     var co=[coords[i].x,coords[i].y];
-     var co2=[[coords[i+1].x,coords[i+1].y]];
-    const [x1, y1] = co;
-    const [x2, y2] = co2;
+  for (let i = 0; i < ccoords.length-1; i++) {
+  
+     var x1=ccoords[i].x;
+     var y1=ccoords[i].y;
+     var x2=ccoords[i+1].x;
+     var y2=ccoords[i+1].y;
+
     area += x1 * y2 - x2 * y1;
   }
+ 
   return Math.abs(area / 2); // Use Math.abs for a positive area value
 }
 
@@ -424,7 +348,94 @@ function geodeticToEcef(latitude, longitude, altitude = 0) {
 
     return { x, y, z };
 }
+function procdist(e){
+      route={points:[]};
+    routes=[];
+   // map.on('click', 
+     //     function(e){
+            var lat = (e.latlng.lat);
+            var lng = (e.latlng.lng);
+            route.points.push([lat,lng]);
+        //    alert("Point added to distance calc: " + lat + ", " + lng);
+var myIcon = L.icon({
+    iconUrl: 'https://www.pngguru.in/storage/uploads/images/a-colorful-bird-free-png-images-on-transparent-background_1744195175_1266534286.webp',
+    iconSize: [38, 95],
+    iconAnchor: [22, 94],
+    popupAnchor: [-3, -76],
+   // shadowUrl: 'my-icon-shadow.png',
+    shadowSize: [68, 95],
+    shadowAnchor: [22, 94]
+});
 
+var myIcon = L.divIcon({className: 'my-div-icon'});
+
+marker = L.marker([lat,lng]).addTo(map);
+
+          //   marker = L.marker([lat,lng]).addTo(map);
+            if(route.points.length===2){
+              var from=L.latLng(route.points[0][0],route.points[0][1]);
+              var to=L.latLng(route.points[1][0],route.points[1][1]);
+              var dist=from.distanceTo(to);
+              var obdis={};
+              obdis.distance=dist.toFixed(2);
+              obdis.from=from;
+              obdis.to=to;
+              var so=JSON.stringify(obdis).replace(/"/g," ").replace(/,/g,"<br>").replace(/{/g,"<br>").replace(/}/g,"<br>");
+ 
+              myLine = L.polyline([route.points[0], route.points[1]], {color: 'green'}).addTo(map);
+
+marker = L.marker([lat,lng]).addTo(map);
+ marker.bindPopup("<b>Distance to previous point: "+so+" meters."+"</b>").openPopup()
+
+              route={points:[]};
+              if(routes.length>0){
+                map.removeLayer(routes[routes.length-1]);
+              }
+            }
+     //     })
+  }
+
+function propoly(e){
+
+          var lat = (e.latlng.lat);
+            var lng = (e.latlng.lng);
+            route.points.push([lat,lng]);
+          //  alert("Point added to polygon: " + lat + ", " + lng);
+            marker = L.marker([lat,lng]).addTo(map);
+            var point=geodeticToEcef(lat,lng,0) ;
+           // alert(JSON.stringify(point));
+            arpol.push(point);
+          var so=route.points.length+"\n"+areapol+"\n"+JSON.stringify( point ).replace(/"/g," ").replace(/,/g,"<br>").replace(/{/g,"<br>").replace(/}/g,"<br>");
+
+            marker.bindPopup("<b>Point: "+so+"  "+"</b>").openPopup()
+            if(route.points.length>=3){
+              var ss=JSON.stringify(arpol).replace(/"/g," ").replace(/,/g,"<br>").replace(/{/g,"<br>").replace(/}/g,"<br>");
+            areapol=calculatePolygonArea(arpol);
+        //    alert("Current Polygon Area: \n\n"+areapol+" square meters.");
+
+
+              if(routes.length>0){
+                map.removeLayer(routes[routes.length-1]);
+
+              }
+              var polygon = L.polygon(route.points, {color: 'blue'}).addTo(map);
+            polygon.bindTooltip("Current Polygon Area: \n\n"+areapol+" square meters.", {
+    permanent: true,
+    direction: "center",
+    className: "my-labels" // Optional CSS class for styling
+}).openTooltip();  
+              routes.push(polygon);
+            }
+
+
+
+}
+function prodef(e){
+            var lat = (e.latlng.lat);
+            var lng = (e.latlng.lng);
+            marker = L.marker([lat,lng]).addTo(map);
+            marker.bindPopup("<b>Point added at: "+lat+", "+lng+"</b>").openPopup()
+}
 
 
 </script>
