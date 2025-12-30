@@ -298,6 +298,21 @@ var marker = L.marker([cord.latitude, cord.longitude]).addTo(map);
  // marker.coords=cos;//marker.coord
     marker.bindPopup("<b>"+cos+"</b>").openPopup()
   //   marker.bindPopup("<b>oooo</b><br>is here").openPopup();
+
+if(sopc.value==="make polygon" && marca===false){
+              propoly({latlng:{lat:cord.latitude,lng:cord.longitude}})
+            };
+        /*                                                     if(sopc.value==="make polygon"){
+              propoly(e)
+            };          */
+            if(sopc.value==="calc dist"){
+              procdist({latlng:{lat:cord.latitude,lng:cord.longitude}})
+            };
+            if(sopc.value==="Choose an Option"){
+              prodef({latlng:{lat:cord.latitude,lng:cord.longitude}});
+            };
+
+
  })
  
     } 
