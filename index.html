@@ -152,7 +152,7 @@ loadDoc(linklib,function(data){
 
 
 
-  let map,coord={},routes=[],route={points:[]},lastPoint=null,polarea=0,polpoints=[];
+  let map,coord={},routes=[],route={points:[]},lastPoint=null,polarea=0,polpoints=[],marca=false;
   let markers = { water: [], shelter: [] },marker;
   let markerState = { water: true, shelter: true }; // Track enabled/disabled states
   
@@ -176,9 +176,12 @@ setTimeout(function(){
 					function(e){
           //  alert("ok");
        //     alert(sopc.value);
-            if(sopc.value==="make polygon"){
+            if(sopc.value==="make polygon" && marca===false){
               propoly(e)
             };
+        /*                                                     if(sopc.value==="make polygon"){
+              propoly(e)
+            };          */
             if(sopc.value==="calc dist"){
               procdist(e)
             };
@@ -199,14 +202,14 @@ setTimeout(function(){
     }).addTo(map);
   
     // Add Markers to Map
-    locations.forEach(loc => {
+ /*   locations.forEach(loc => {
       const marker = L.marker(loc.coords)
         .bindPopup(`<b>${loc.name}</b><br>Type: ${loc.type}`);
   
       markers[loc.type].push(marker);
       marker.addTo(map);
     });
-  
+  */
     updateButtons(); // Set initial button states
   }
   
@@ -257,9 +260,12 @@ function success(pos) {
  // alert("Your current position is:  "+`Latitude : ${crd.latitude}`+`Longitude: ${crd.longitude}`+`More or less ${crd.accuracy} meters.`);
   map.setView([crd.latitude, crd.longitude], 13);
 
- marker = L.marker([crd.latitude, crd.longitude]).addTo(map);
-    marker.bindPopup("<b>AQUI</b><br>is here").openPopup();
-
+ //marker = L.marker([crd.latitude, crd.longitude]).addTo(map);
+  //  marker.bindPopup("<b>AQUI</b><br>is here").openPopup();
+//var marker = new L.marker([crd.latitude, crd.longitude], { opacity: 0.01 }); //opacity may be set to zero
+///marker.bindTooltip("My Label", {permanent: true, className: "my-label", offset: [0, 0] });
+//marker.addTo(map);
+addTxt("position inicial",crd);
   //  alert(JSON.stringify(marker));
  //   alert(marker.latitude)
 
@@ -269,7 +275,14 @@ function error(err) {
   alert(`ERROR(${err.code}): ${err.message}`);
 }
 
-  
+  function addTxt(text,coords){
+var marker = new L.marker([coords.latitude, coords.longitude], { opacity: 0.01 }); //opacity may be set to zero
+marker.bindTooltip(text, {permanent: true, className: "my-label", offset: [0, 0] });
+marker.addTo(map);
+
+
+    
+  }
   
   window.navigator.geolocation.getCurrentPosition(success, error, options);
   
@@ -299,10 +312,16 @@ var arpol=[],areapol=0;
 function selectOpc(val){
  
   if(val==="make polygon"){
-
+ route.points.length=0;
+ arpol.length=0;
+ areapol=0;
+ marca=false;
   }
   if(val==="calc dist"){
-  
+  route.points.length=0;
+ arpol.length=0;
+ areapol=0;
+ marca=false;
 }
 }
 
@@ -349,50 +368,45 @@ function geodeticToEcef(latitude, longitude, altitude = 0) {
     return { x, y, z };
 }
 function procdist(e){
-      route={points:[]};
-    routes=[];
-   // map.on('click', 
-     //     function(e){
-            var lat = (e.latlng.lat);
+  
+  if(route.points.length<2){
+          var lat = (e.latlng.lat);
             var lng = (e.latlng.lng);
             route.points.push([lat,lng]);
-        //    alert("Point added to distance calc: " + lat + ", " + lng);
-var myIcon = L.icon({
-    iconUrl: 'https://www.pngguru.in/storage/uploads/images/a-colorful-bird-free-png-images-on-transparent-background_1744195175_1266534286.webp',
-    iconSize: [38, 95],
-    iconAnchor: [22, 94],
-    popupAnchor: [-3, -76],
-   // shadowUrl: 'my-icon-shadow.png',
-    shadowSize: [68, 95],
-    shadowAnchor: [22, 94]
-});
-
-var myIcon = L.divIcon({className: 'my-div-icon'});
-
-marker = L.marker([lat,lng]).addTo(map);
-
-          //   marker = L.marker([lat,lng]).addTo(map);
-            if(route.points.length===2){
-              var from=L.latLng(route.points[0][0],route.points[0][1]);
-              var to=L.latLng(route.points[1][0],route.points[1][1]);
-              var dist=from.distanceTo(to);
-              var obdis={};
-              obdis.distance=dist.toFixed(2);
-              obdis.from=from;
-              obdis.to=to;
-              var so=JSON.stringify(obdis).replace(/"/g," ").replace(/,/g,"<br>").replace(/{/g,"<br>").replace(/}/g,"<br>");
+  }
  
-              myLine = L.polyline([route.points[0], route.points[1]], {color: 'green'}).addTo(map);
-
 marker = L.marker([lat,lng]).addTo(map);
- marker.bindPopup("<b>Distance to previous point: "+so+" meters."+"</b>").openPopup()
 
-              route={points:[]};
+            if(route.points.length===2){
+
+                       if(route.points.length>1){
+
+              var i=route.points.length-1;
+              var x1=route.points[i-1][0];
+              var y1=route.points[i-1][1];
+              var x2=route.points[i][0];
+              var y2=route.points[i][1];
+              var from=L.latLng(route.points[i-1][0],route.points[i-1][1]);
+              var to=L.latLng(route.points[i][0],route.points[i][1]);
+              var dist="Distance: "+from.distanceTo(to).toFixed(2)+" meters";
+                           myLine = L.polyline([route.points[0], route.points[1]], {color: 'blue'}).addTo(map);
+  
+            //  alert(route.points[1]);
+              var co={}
+
+
+              co.latitude=(x2+x1)/2;
+              co.longitude=(y2+y1)/2;
+
+              addTxt(JSON.stringify(dist),co);
+            }  
+
+                route={points:[]};
               if(routes.length>0){
                 map.removeLayer(routes[routes.length-1]);
               }
             }
-     //     })
+  
   }
 
 function propoly(e){
@@ -408,6 +422,27 @@ function propoly(e){
           var so=route.points.length+"\n"+areapol+"\n"+JSON.stringify( point ).replace(/"/g," ").replace(/,/g,"<br>").replace(/{/g,"<br>").replace(/}/g,"<br>");
 
             marker.bindPopup("<b>Point: "+so+"  "+"</b>").openPopup()
+            if(route.points.length>1){
+
+              var i=route.points.length-1;
+              var x1=route.points[i-1][0];
+              var y1=route.points[i-1][1];
+              var x2=route.points[i][0];
+              var y2=route.points[i][1];
+              var from=L.latLng(route.points[i-1][0],route.points[i-1][1]);
+              var to=L.latLng(route.points[i][0],route.points[i][1]);
+              var dist="Distance: "+from.distanceTo(to).toFixed(2)+" meters";
+                           myLine = L.polyline([route.points[0], route.points[1]], {color: 'blue'}).addTo(map);
+  
+            //  alert(route.points[1]);
+              var co={}
+
+
+              co.latitude=(x2+x1)/2;
+              co.longitude=(y2+y1)/2;
+
+              addTxt(JSON.stringify(dist),co);
+            }
             if(route.points.length>=3){
               var ss=JSON.stringify(arpol).replace(/"/g," ").replace(/,/g,"<br>").replace(/{/g,"<br>").replace(/}/g,"<br>");
             areapol=calculatePolygonArea(arpol);
@@ -435,6 +470,11 @@ function prodef(e){
             var lng = (e.latlng.lng);
             marker = L.marker([lat,lng]).addTo(map);
             marker.bindPopup("<b>Point added at: "+lat+", "+lng+"</b>").openPopup()
+}
+
+function getDist(from,to){
+  var dist=from.distanceTo(to);
+  return dist;
 }
 
 
